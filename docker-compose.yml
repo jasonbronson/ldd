@@ -1,0 +1,48 @@
+version: "3"
+services:
+  db:
+    image: postgres:12
+    networks:
+      - backend
+    environment:
+      POSTGRES_DB: ldd_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - 5432:5432
+    volumes:
+      - db-data:/var/lib/postgresql/data
+#   cron:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     command: CompileDaemon -log-prefix=false -build="make buildcron" -command="/app/dist/cron"
+#     env_file: ./.env
+#     volumes:
+#       - .:/app
+#     depends_on:
+#       - db
+#     networks:
+#       - backend
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: CompileDaemon -log-prefix=false -build="make build" -command="./dist/api"
+    env_file: ./.env
+    security_opt:
+      - "seccomp:unconfined"
+    volumes:
+      - .:/app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - backend
+
+volumes:
+  db-data:
+
+networks:
+  backend:
