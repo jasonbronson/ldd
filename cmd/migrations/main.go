@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -10,19 +9,21 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/joho/godotenv"
 )
+
 func main() {
-	// Flag command line
-	databaseurl := flag.String("database", os.Getenv("DATABASE_URL"), "a string")
-	dir := flag.String("source", os.Getenv("MIGRATIONS_PKG_DIR"), "a string")
-	flag.Parse()
-	if *databaseurl == "" {
-		*databaseurl = fmt.Sprintf("postgresql://%s:%s@%s:%s/%s", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB"))
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("Error loading .env file")
 	}
-	if *dir == "" {
-		*dir = "./migrations"
+	databaseurl := os.Getenv("DATABASE_URL")
+	if databaseurl == "" {
+		databaseurl = fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=disable", os.Getenv("POSTGRES_DB_USER"), os.Getenv("POSTGRES_DB_PASSWORD"), os.Getenv("POSTGRES_DB_HOST"), os.Getenv("POSTGRES_DB_PORT"), os.Getenv("POSTGRES_DB_DATABASE"))
 	}
-	abs, err := filepath.Abs(*dir)
+
+	dir := "./migrations"
+	abs, err := filepath.Abs(dir)
 	if err != nil {
 		log.Fatal("Path not valid", err)
 	}
@@ -30,17 +31,17 @@ func main() {
 	if os.IsNotExist(err) {
 		log.Fatal("path to migrations is invalid")
 	}
-	m, err := migrate.New("file://"+abs, *databaseurl)
+	m, err := migrate.New("file://"+abs, databaseurl)
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("Running migrations")
-	err = m.Up();
+	err = m.Up()
 	if err != nil && err != migrate.ErrNoChange {
 		log.Fatal(err)
 	}
 	if err == migrate.ErrNoChange {
-		log.Println("No changes")		
+		log.Println("No changes")
 	}
 
 	fmt.Println("Migrations complete")
