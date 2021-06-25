@@ -21,6 +21,7 @@ type Config struct {
 	MaxConnections     int
 	MaxIdleConnections int
 	ServiceKey         string
+	Levels             string
 }
 
 func init() {
@@ -41,4 +42,5 @@ func initEnv() {
 	Cfg.MaxIdleConnections, _ = strconv.Atoi(os.Getenv("DATABASE_MAX_IDLE_CONNECTIONS"))
 	Cfg.DisableSSL, _ = strconv.ParseBool(os.Getenv("DISABLE_SSL"))
 	Cfg.ServiceKey = os.Getenv("SERVICE_KEY")
+	Cfg.Levels = os.Getenv("LEVELS")
 }

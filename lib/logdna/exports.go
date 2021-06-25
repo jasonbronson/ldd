@@ -1,8 +1,8 @@
 package logdna
 
 import (
-	"fmt"
 	"log"
+	"net/url"
 	"strconv"
 )
 
@@ -41,15 +41,12 @@ type ExportReponse struct {
 
 func (client *LogdnaClient) GetLog(startTime int64, endTime int64, levels string, query string) (ExportReponse, error) {
 	var exportReponse ExportReponse
-	fmt.Println(strconv.FormatInt(endTime, 10), endTime, levels, query)
 	path := "export?" +
 		"from=" + strconv.FormatInt(startTime, 10) +
 		"&to=" + strconv.FormatInt(endTime, 10) +
 		"&levels=" + levels +
-		"&size=" + strconv.FormatInt(1000, 10)
-	if query != "" {
-		path += "&query=" + query
-	}
+		"&query=" + url.QueryEscape(query)
+
 	resp, err := client._get(
 		path,
 		[]byte(""))

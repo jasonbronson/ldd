@@ -19,7 +19,8 @@ func (client *LogdnaClient) basicAuth() string {
 func (client *LogdnaClient) signRequest(method string, path string, body []byte) *http.Request {
 	req, _ := http.NewRequest(method, URL+path, bytes.NewBuffer(body))
 	req.Header.Set("Accept", "application/json")
-	req.Header.Add("Authorization", "Basic "+client.basicAuth())
+	// req.Header.Add("Authorization", "Basic "+client.basicAuth())
+	req.Header.Add("Authorization", "Basic MjcxNWFiYTAyMDE2NDY0OWE2M2M1ZGZkMDEzZTAyYmE6")
 	return req
 }
 

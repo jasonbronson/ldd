@@ -9,7 +9,7 @@ import (
 
 type Logs struct {
 	Id              string    `gorm:"primary_key" json:"id"`
-	Log             string    `json:"line"`
+	Log_line        string    `json:"log_line"`
 	Last_error      time.Time `json:"last_error"`
 	Updated_at      time.Time `json:"updated_at"`
 	Error_count     int64     `json:"error_count"`
