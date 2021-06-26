@@ -17,7 +17,6 @@ func initDB() {
 	}
 
 	driver := "postgres"
-	fmt.Println(Cfg.DatabaseURL)
 
 	db, err := sql.Open(driver, Cfg.DatabaseURL)
 	if err != nil {
