@@ -14,10 +14,10 @@ func NewRoute(cfg *config.Config) http.Handler {
 	router.GET("/", controller.Live)
 
 	router.GET("/api/logmatches", controller.GetLogMatches)
-	router.GET("/api/matches", controller.GetMatches)
+	router.GET("/api/matches", controller.GetAllMatches)
 
 	router.POST("/api/matches", controller.PostMatches)
 
-	router.PATCH("/api/matches", controller.PatchMatches)
+	router.PATCH("/api/matches/:matchID", controller.PatchMatches)
 	return router
 }

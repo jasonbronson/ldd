@@ -1,4 +1,4 @@
-package cron
+package main
 
 import (
 	"log"
@@ -6,7 +6,7 @@ import (
 	"os/signal"
 
 	"github.com/jasonbronson/ldd/jobs"
-	"github.com/robfig/cron/v3"
+	"github.com/robfig/cron"
 )
 
 func main() {

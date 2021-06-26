@@ -12,18 +12,18 @@ services:
       - 5432:5432
     volumes:
       - db-data:/var/lib/postgresql/data
-#   cron:
-#     build:
-#       context: .
-#       dockerfile: Dockerfile
-#     command: CompileDaemon -log-prefix=false -build="make buildcron" -command="/app/dist/cron"
-#     env_file: ./.env
-#     volumes:
-#       - .:/app
-#     depends_on:
-#       - db
-#     networks:
-#       - backend
+  cron:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: CompileDaemon -log-prefix=false -build="make buildcron" -command="/app/dist/cron"
+    env_file: ./.env
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    networks:
+      - backend
   app:
     build:
       context: .
@@ -40,7 +40,16 @@ services:
       - db
     networks:
       - backend
-
+  migrations:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: CompileDaemon -log-prefix=false -build="make buildmigrate" -command="/app/dist/migrations"
+    volumes:
+      - .:/app
+    networks:
+      - backend
+    
 volumes:
   db-data:
 
