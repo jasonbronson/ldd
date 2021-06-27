@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	GetLogJobInterval = "@every 1h0m0s"
+	GetLogJobInterval = "@every 24h0m0s"
 )
 
 func GetLogJob() {
