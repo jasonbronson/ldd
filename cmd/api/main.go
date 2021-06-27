@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/bugsnag/bugsnag-go"
 	"github.com/jasonbronson/ldd/config"
 	"github.com/jasonbronson/ldd/routes"
 )
@@ -18,7 +17,7 @@ func main() {
 
 	server := http.Server{
 		Addr:    ":" + Cfg.Port,
-		Handler: bugsnag.Handler(routes.NewRoute(Cfg)),
+		Handler: routes.NewRoute(Cfg),
 	}
 
 	shutdown := make(chan struct{})

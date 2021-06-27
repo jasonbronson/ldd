@@ -13,6 +13,8 @@ CREATE TABLE IF NOT EXISTS "public"."logs" (
     "last_error" timestamp(0),
     "updated_at" timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "error_count" int8,
+    "time_start" int4,
+    "time_end" int4,
     "matching_string" varchar,
     PRIMARY KEY ("id")
 );

@@ -17,11 +17,10 @@ func GetLogsLine(db *gorm.DB, limit int) ([]*models.Logs, error) {
 	return logsLine, result.Error
 }
 
-func GetLogFromMatchingString(db *gorm.DB, matching_string string) (models.Logs, error) {
+func GetLogFromMatchingString(db *gorm.DB, logs *models.Logs) (models.Logs, error) {
 
 	var logLine models.Logs
-
-	result := db.Find(&logLine).Where("matching_string=?", matching_string)
+	result := db.Find(&logLine).Where("matching_string=? and time_start = ? and time_end = ?", logs.Matching_string, logs.Time_start, logs.Time_end)
 	return logLine, result.Error
 }
 

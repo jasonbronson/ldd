@@ -2,7 +2,7 @@ DIST_DIR = ./dist
 TIMESTAMP ?= $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 SHA ?= $(shell git rev-parse --short HEAD)
 
-DATABASE_URL := postgresql://admin:admin@postgres:5432/ldd_db?sslmode=disable
+DATABASE_URL := postgresql://postgres:admin@192.168.1.99:5432/ldd?sslmode=disable
 
 local:
 	docker-compose up

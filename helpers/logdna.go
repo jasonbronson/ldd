@@ -1,6 +1,8 @@
 package helpers
 
 import (
+	"log"
+
 	"github.com/jasonbronson/ldd/config"
 	logdnasdk "github.com/jasonbronson/ldd/lib/logdna"
 )
@@ -15,7 +17,9 @@ func GetLogs(startTime int64, endTime int64, levels string, query string) (logsL
 	logsLine, err = client.GetLog(startTime, endTime, levels, query)
 
 	if err != nil {
+		log.Println("error getting logs ", logsLine)
 		return
 	}
+	log.Println(logsLine)
 	return
 }

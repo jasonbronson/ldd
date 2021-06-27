@@ -19,8 +19,8 @@ const (
 
 func GetLogJob() {
 
-	startTime := time.Now().Unix()
-	endTime := startTime - 3600
+	endTime := time.Now().Unix()
+	startTime := endTime - 86400
 
 	levels := config.Cfg.Levels
 
@@ -51,16 +51,18 @@ func GetLogJob() {
 			Log_line:        i.Line,
 			Updated_at:      time.Now(),
 			Last_error:      time.Unix(i.Ts/1000, 0),
+			Time_start:      startTime,
+			Time_end:        endTime,
 			Matching_string: matchString,
 		}
 		logs = append(logs, log)
 	}
 	fmt.Println("=====Update Database=====")
-	UpdateDataBase(logs)
+	UpdateDB(logs)
 	fmt.Println("=====Cronjob Done=====")
 }
 
-func UpdateDataBase(logs []*models.Logs) {
+func UpdateDB(logs []*models.Logs) {
 	logMatches, err := repository.GetLogsLine(config.Cfg.GormDB, 0)
 	if err != nil {
 		log.Println(err)
@@ -69,19 +71,19 @@ func UpdateDataBase(logs []*models.Logs) {
 
 	var temp string
 	match_strings := helpers.ConvertLogMatchestoMatchString(logMatches)
-	for _, log := range logs {
-		if !Checkstrings(match_strings, log.Matching_string) {
-			repository.CreateLogs(config.Cfg.GormDB, *log)
-			match_strings = append(match_strings, log.Matching_string)
+	for _, logData := range logs {
+		if !Checkstrings(match_strings, logData.Matching_string) {
+			repository.CreateLogs(config.Cfg.GormDB, *logData)
+			match_strings = append(match_strings, logData.Matching_string)
 		}
 
 		// Update Error_count
-		if strings.Compare(temp, log.Matching_string) == 0 {
+		if strings.Compare(temp, logData.Matching_string) == 0 {
 			continue
 		}
-		data, _ := repository.GetLogFromMatchingString(config.Cfg.GormDB, log.Matching_string)
+		data, _ := repository.GetLogFromMatchingString(config.Cfg.GormDB, logData)
 		repository.UpdateLogs(config.Cfg.GormDB, data)
-		temp = log.Matching_string
+		temp = logData.Matching_string
 	}
 
 }

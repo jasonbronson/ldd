@@ -47,6 +47,8 @@ func (client *LogdnaClient) GetLog(startTime int64, endTime int64, levels string
 		"&levels=" + levels +
 		"&query=" + url.QueryEscape(query)
 
+	log.Println(path)
+
 	resp, err := client._get(
 		path,
 		[]byte(""))
