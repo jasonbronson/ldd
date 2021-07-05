@@ -1,6 +1,7 @@
 package jobs
 
 import (
+	"encoding/json"
 	"log"
 	"regexp"
 	"time"
@@ -27,6 +28,11 @@ func GetLogJob() {
 		return
 	}
 
+	if len(allMatches) < 1 {
+		log.Println("There are no MatchingString in the Matches table")
+		return
+	}
+
 	for _, item := range allMatches {
 
 		match := item.MatchingString
@@ -36,23 +42,21 @@ func GetLogJob() {
 			log.Println(err)
 			return
 		}
-		//fmt.Println(data)
+		// fmt.Println(data)
 		for _, i := range data.Lines {
 			if CheckMatchStringAgainstLine(i.Line, match) {
-				log.Println(i.Line)
 				logLine := &models.Logs{
-					Log_line:       i.Line,
-					Updated_at:     time.Now(),
-					Last_error:     time.Unix(i.Ts/1000, 0),
+					LogLine:        i.Line,
+					UpdatedAt:      time.Now(),
+					LastError:      time.Unix(i.TS/1000, 0),
 					MatchingString: match,
 				}
 				logFound := &models.LogsFound{
-					LogsID:    "",
+					LogsID:    i.ID,
 					TimeStart: time.Unix(startTime, 0),
 					TimeEnd:   time.Unix(endTime, 0),
 				}
 
-				log.Println("=====Update Database=====")
 				UpdateDB(logLine, logFound)
 			}
 
@@ -65,21 +69,31 @@ func GetLogJob() {
 
 func UpdateDB(logs *models.Logs, logsFound *models.LogsFound) {
 
-	logsDB, _ := repository.GetLogFromMatchingString(config.Cfg.GormDB, logs)
-	if len(logsDB.Id) < 1 {
+	logsDB, _ := repository.GetLogsByMatchingString(config.Cfg.GormDB, logs.MatchingString)
+	if len(logsDB.ID) < 1 {
+		//Print the logs
+		logsJson, _ := json.Marshal(logs)
+		log.Println(string(logsJson))
+
 		err := repository.CreateLogs(config.Cfg.GormDB, *logs)
 		if err != nil {
+			log.Println("Error to CreateLogs: ", err)
 			//repository.UpdateLogs(config.Cfg.GormDB, *logs)
 		}
 	}
 
-	logsFound, _ = repository.GetLogsFoundById(config.Cfg.GormDB, logsDB.Id)
-	if len(logsFound.LogsID) < 1 {
-		logsFound.LogsID = logsDB.Id
-		repository.CreateLogsFound(config.Cfg.GormDB, *logsFound)
-		// if err != nil {
-		// 	repository.UpdateLogsFound(config.Cfg.GormDB, *logsFound)
-		// }
+	logsFoundDB, _ := repository.GetLogsFoundById(config.Cfg.GormDB, logsDB.ID)
+	if len(logsFoundDB.LogsID) < 1 {
+		//Print the logs_found
+		logsFoundJson, _ := json.Marshal(logsFound)
+		log.Println(string(logsFoundJson))
+
+		logsFound.LogsID = logsDB.ID
+		err := repository.CreateLogsFound(config.Cfg.GormDB, *logsFound)
+		if err != nil {
+			log.Println("Error to CreateLogsFound: ", err)
+			// repository.UpdateLogsFound(config.Cfg.GormDB, *logsFound)
+		}
 	}
 
 }

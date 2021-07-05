@@ -8,10 +8,10 @@ import (
 )
 
 type Logs struct {
-	Id             string    `gorm:"primary_key" json:"id"`
-	Log_line       string    `json:"log_line"`
-	Last_error     time.Time `json:"last_error"`
-	Updated_at     time.Time `json:"updated_at"`
+	ID             string    `gorm:"primary_key" json:"id"`
+	LogLine        string    `json:"log_line"`
+	LastError      time.Time `json:"last_error"`
+	UpdatedAt      time.Time `json:"updated_at"`
 	MatchingString string    `json:"matching_string"`
 }
 
@@ -19,8 +19,8 @@ func (d Logs) TableName() string {
 	return "logs"
 }
 func (d *Logs) BeforeCreate(tx *gorm.DB) (err error) {
-	if d.Id == "" {
-		d.Id = uuid.Must(uuid.NewV4(), nil).String()
+	if d.ID == "" {
+		d.ID = uuid.Must(uuid.NewV4(), nil).String()
 	}
 	return nil
 }

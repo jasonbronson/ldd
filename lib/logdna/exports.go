@@ -21,17 +21,17 @@ type Line struct {
 	Line        string   `json:"_line"`
 	Rawline     string   `json:"_rawline"`
 	Level       string   `json:"level"`
-	Ts          int64    `json:"_ts"`
+	TS          int64    `json:"_ts"`
 	App         string   `json:"_app"`
 	Pod         string   `json:"pod"`
 	Namespace   string   `json:"namespace"`
 	Container   string   `json:"container"`
 	Containerid string   `json:"containerid"`
 	Node        string   `json:"node"`
-	Ip          string   `json:"_ip"`
+	IP          string   `json:"_ip"`
 	Key         string   `json:"__key"`
 	Bid         string   `json:"_bid"`
-	Id          string   `json:"_id"`
+	ID          string   `json:"_id"`
 }
 
 type ExportReponse struct {
@@ -46,7 +46,7 @@ func (client *LogdnaClient) GetLog(startTime int64, endTime int64, levels string
 		"&to=" + strconv.FormatInt(endTime, 10) +
 		"&levels=" + levels +
 		"&query=" + url.QueryEscape(query) +
-		"&apps=video-api"
+		"&apps=video-api-cron"
 
 	log.Println(path)
 
