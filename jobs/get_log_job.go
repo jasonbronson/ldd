@@ -1,10 +1,8 @@
 package jobs
 
 import (
-	"fmt"
 	"log"
 	"regexp"
-	"strings"
 	"time"
 
 	"github.com/jasonbronson/ldd/config"
@@ -14,14 +12,13 @@ import (
 )
 
 const (
-	GetLogJobInterval = "@every 24h0m0s"
+	GetLogJobInterval = "@every 0h1m0s"
 )
 
 func GetLogJob() {
 
 	endTime := time.Now().Unix()
-	startTime := endTime - 86400
-
+	startTime := endTime - 432000
 	levels := config.Cfg.Levels
 
 	allMatches, err := repository.GetAllMatches(config.Cfg.GormDB)
@@ -30,79 +27,64 @@ func GetLogJob() {
 		return
 	}
 
-	match_strings := helpers.ConvertMatchestoMatchString(allMatches)
+	for _, item := range allMatches {
 
-	query := strings.Join(match_strings, " OR ")
-
-	fmt.Println("=====Loading logs from logdna=====")
-	data, err := helpers.GetLogs(startTime, endTime, levels, query)
-
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	// fmt.Println(data)
-
-	var logs []*models.Logs
-	for _, i := range data.Lines {
-		matchString := GetMatchString(i.Line, match_strings)
-		log := &models.Logs{
-			Error_count:     1,
-			Log_line:        i.Line,
-			Updated_at:      time.Now(),
-			Last_error:      time.Unix(i.Ts/1000, 0),
-			Time_start:      startTime,
-			Time_end:        endTime,
-			Matching_string: matchString,
+		match := item.MatchingString
+		log.Printf("Loading logs from logdna using query: %v \n", match)
+		data, err := helpers.GetLogs(startTime, endTime, levels, match)
+		if err != nil {
+			log.Println(err)
+			return
 		}
-		logs = append(logs, log)
+		//fmt.Println(data)
+		for _, i := range data.Lines {
+			if CheckMatchStringAgainstLine(i.Line, match) {
+				log.Println(i.Line)
+				logLine := &models.Logs{
+					Log_line:       i.Line,
+					Updated_at:     time.Now(),
+					Last_error:     time.Unix(i.Ts/1000, 0),
+					MatchingString: match,
+				}
+				logFound := &models.LogsFound{
+					LogsID:    "",
+					TimeStart: time.Unix(startTime, 0),
+					TimeEnd:   time.Unix(endTime, 0),
+				}
+
+				log.Println("=====Update Database=====")
+				UpdateDB(logLine, logFound)
+			}
+
+		}
+
 	}
-	fmt.Println("=====Update Database=====")
-	UpdateDB(logs)
-	fmt.Println("=====Cronjob Done=====")
+
+	log.Println("=====Cronjob Done=====")
 }
 
-func UpdateDB(logs []*models.Logs) {
-	logMatches, err := repository.GetLogsLine(config.Cfg.GormDB, 0)
-	if err != nil {
-		log.Println(err)
-		return
+func UpdateDB(logs *models.Logs, logsFound *models.LogsFound) {
+
+	logsDB, _ := repository.GetLogFromMatchingString(config.Cfg.GormDB, logs)
+	if len(logsDB.Id) < 1 {
+		err := repository.CreateLogs(config.Cfg.GormDB, *logs)
+		if err != nil {
+			//repository.UpdateLogs(config.Cfg.GormDB, *logs)
+		}
 	}
 
-	var temp string
-	match_strings := helpers.ConvertLogMatchestoMatchString(logMatches)
-	for _, logData := range logs {
-		if !Checkstrings(match_strings, logData.Matching_string) {
-			repository.CreateLogs(config.Cfg.GormDB, *logData)
-			match_strings = append(match_strings, logData.Matching_string)
-		}
-
-		// Update Error_count
-		if strings.Compare(temp, logData.Matching_string) == 0 {
-			continue
-		}
-		data, _ := repository.GetLogFromMatchingString(config.Cfg.GormDB, logData)
-		repository.UpdateLogs(config.Cfg.GormDB, data)
-		temp = logData.Matching_string
+	logsFound, _ = repository.GetLogsFoundById(config.Cfg.GormDB, logsDB.Id)
+	if len(logsFound.LogsID) < 1 {
+		logsFound.LogsID = logsDB.Id
+		repository.CreateLogsFound(config.Cfg.GormDB, *logsFound)
+		// if err != nil {
+		// 	repository.UpdateLogsFound(config.Cfg.GormDB, *logsFound)
+		// }
 	}
 
 }
 
-func Checkstrings(slice []string, str string) bool {
-	for i := range slice {
-		if slice[i] == str {
-			return true
-		}
-	}
-	return false
-}
-
-func GetMatchString(line string, match_strings []string) string {
-	for _, i := range match_strings {
-		regex := regexp.MustCompile(i + `\b`)
-		if regex.MatchString(line) {
-			return i
-		}
-	}
-	return ""
+func CheckMatchStringAgainstLine(line, matchString string) bool {
+	regex := regexp.MustCompile(matchString + `\b`)
+	return regex.MatchString(line)
 }

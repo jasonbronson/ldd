@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "matchingstring" ON "public"."logs" USING BTREE ("matching_string");

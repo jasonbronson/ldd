@@ -6,10 +6,10 @@ import (
 )
 
 type Matches struct {
-	Id              string `gorm:"primary_key" json:"id"`
-	Matching_string string `json:"matching_string"`
-	Name            string `json:"name"`
-	Description     string `json:"description"`
+	Id             string `gorm:"primary_key" json:"id"`
+	MatchingString string `json:"matching_string"`
+	Name           string `json:"name"`
+	Description    string `json:"description"`
 }
 
 func (d Matches) TableName() string {

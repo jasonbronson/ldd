@@ -45,7 +45,8 @@ func (client *LogdnaClient) GetLog(startTime int64, endTime int64, levels string
 		"from=" + strconv.FormatInt(startTime, 10) +
 		"&to=" + strconv.FormatInt(endTime, 10) +
 		"&levels=" + levels +
-		"&query=" + url.QueryEscape(query)
+		"&query=" + url.QueryEscape(query) +
+		"&apps=video-api"
 
 	log.Println(path)
 

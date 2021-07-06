@@ -20,6 +20,6 @@ func GetLogs(startTime int64, endTime int64, levels string, query string) (logsL
 		log.Println("error getting logs ", logsLine)
 		return
 	}
-	log.Println(logsLine)
+	//log.Println(logsLine)
 	return
 }

@@ -45,7 +45,7 @@ func PostMatches(g *gin.Context) {
 
 	fmt.Println(requestData.Matching_string)
 
-	match.Matching_string = requestData.Matching_string
+	match.MatchingString = requestData.Matching_string
 	match.Name = requestData.Name
 	match.Description = requestData.Description
 
@@ -54,15 +54,15 @@ func PostMatches(g *gin.Context) {
 		return
 	}
 
-	if match.Matching_string == "" {
+	if match.MatchingString == "" {
 		helpers.SendError(g, http.StatusBadRequest, errors.New("matching_string was empty"))
 		return
 	}
 
-	fmt.Println(match.Matching_string)
-	data, _ := repository.GetMatchFromMatchString(db, match.Matching_string)
+	fmt.Println(match.MatchingString)
+	data, _ := repository.GetMatchFromMatchString(db, match.MatchingString)
 
-	if data.Matching_string != "" {
+	if data.MatchingString != "" {
 		helpers.SendError(g, http.StatusBadRequest, errors.New("matching_string already exists"))
 		return
 	}
@@ -90,7 +90,7 @@ func PatchMatches(g *gin.Context) {
 		return
 	}
 
-	match.Matching_string = requestData.Matching_string
+	match.MatchingString = requestData.Matching_string
 	match.Name = requestData.Name
 	match.Description = requestData.Description
 	match.Id = matchId
@@ -105,7 +105,7 @@ func PatchMatches(g *gin.Context) {
 		return
 	}
 
-	if match.Matching_string == "" {
+	if match.MatchingString == "" {
 		helpers.SendError(g, http.StatusBadRequest, errors.New("matching_string was empty"))
 		return
 	}
