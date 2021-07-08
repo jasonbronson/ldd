@@ -1,32 +1,29 @@
 package config
 
 import (
-	"database/sql"
-	"fmt"
 	"log"
-	"os"
 
-	_ "github.com/lib/pq"
-	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
 func initDB() {
 	if Cfg.DatabaseURL == "" {
-		Cfg.DatabaseURL = fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=disable", os.Getenv("POSTGRES_DB_USER"), os.Getenv("POSTGRES_DB_PASSWORD"), os.Getenv("POSTGRES_DB_HOST"), os.Getenv("POSTGRES_DB_PORT"), os.Getenv("POSTGRES_DB_DATABASE"))
+		Cfg.DatabaseURL = "file:ldd.db?cache=shared"
 	}
 
-	driver := "postgres"
-
-	db, err := sql.Open(driver, Cfg.DatabaseURL)
+	var err error
+	Cfg.GormDB, err = gorm.Open(sqlite.Open(Cfg.DatabaseURL), &gorm.Config{})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Error: %v", err)
+		return
 	}
-	Cfg.GormDB, err = gorm.Open(postgres.New(postgres.Config{
-		Conn: db,
-	}), &gorm.Config{})
+
+	db, err := Cfg.GormDB.DB()
+
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Error: %v", err)
+		return
 	}
 	//defer db.Close()
 	db.SetMaxOpenConns(Cfg.MaxConnections)

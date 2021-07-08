@@ -8,18 +8,18 @@ import (
 func GetLogsLine(db *gorm.DB, limit int) ([]*models.Logs, error) {
 
 	var logsLine []*models.Logs
-	var result *gorm.DB
-	if limit != 0 {
-		result = db.Order("error_count desc").Limit(limit).Find(&logsLine)
-	} else {
-		result = db.Find(&logsLine)
-	}
+	// var result *gorm.DB
+	// if limit != 0 {
+	// 	result = db.Order("error_count desc").Limit(limit).Find(&logsLine)
+	// } else {
+	result := db.Limit(limit).Find(&logsLine)
+	// }
 	return logsLine, result.Error
 }
 
-func GetLogFromMatchingString(db *gorm.DB, logs *models.Logs) (models.Logs, error) {
-	var logLine models.Logs
-	result := db.Find(&logLine).Where("matching_string=?", logs.MatchingString)
+func GetLogsByMatchingString(db *gorm.DB, matchingString string) (*models.Logs, error) {
+	var logLine *models.Logs
+	result := db.Find(&logLine).Where("matching_string=?", matchingString)
 	return logLine, result.Error
 }
 

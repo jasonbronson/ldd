@@ -11,10 +11,10 @@ test:
 	docker exec -it -e ENVIRONMENT=test promoengine-api go test ./controller -v
 
 build: ## Build go binary
-	CGO_ENABLED=0 go build -ldflags "-s -w -X main.buildtime=$(TIMESTAMP) -X main.commitsha=$(SHA)" -o ${DIST_DIR}/api ./cmd/api/main.go
+	go build -ldflags "-s -w -X main.buildtime=$(TIMESTAMP) -X main.commitsha=$(SHA)" -o ${DIST_DIR}/api ./cmd/api/main.go
 
 buildcron: ## Build go binary
-	CGO_ENABLED=0 go build -ldflags "-s -w -X main.buildtime=$(TIMESTAMP) -X main.commitsha=$(SHA)" -o ${DIST_DIR}/cron ./cmd/cron/main.go
+	go build -ldflags "-s -w -X main.buildtime=$(TIMESTAMP) -X main.commitsha=$(SHA)" -o ${DIST_DIR}/cron ./cmd/cron/main.go
 
 buildmigrate: 
-	CGO_ENABLED=0 go build -ldflags "-s -w -X main.buildtime=$(TIMESTAMP) -X main.commitsha=$(SHA)" -o ${DIST_DIR}/migrations ./cmd/migrations/main.go
+	go build -ldflags "-s -w -X main.buildtime=$(TIMESTAMP) -X main.commitsha=$(SHA)" -o ${DIST_DIR}/migrations ./cmd/migrations/main.go

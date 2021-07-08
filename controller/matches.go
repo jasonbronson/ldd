@@ -60,14 +60,14 @@ func PostMatches(g *gin.Context) {
 	}
 
 	fmt.Println(match.MatchingString)
-	data, _ := repository.GetMatchFromMatchString(db, match.MatchingString)
+	data, _ := repository.GetMatchesByMatchString(db, match.MatchingString)
 
 	if data.MatchingString != "" {
 		helpers.SendError(g, http.StatusBadRequest, errors.New("matching_string already exists"))
 		return
 	}
 
-	err := repository.CreateMatch(db, match)
+	err := repository.CreateMatches(db, match)
 	if err != nil {
 		helpers.SendError(g, http.StatusBadRequest, err)
 		return
@@ -93,7 +93,7 @@ func PatchMatches(g *gin.Context) {
 	match.MatchingString = requestData.Matching_string
 	match.Name = requestData.Name
 	match.Description = requestData.Description
-	match.Id = matchId
+	match.ID = matchId
 
 	if matchId == "" {
 		helpers.SendError(g, http.StatusNotFound, fmt.Errorf("matchid was empty"))
@@ -110,14 +110,14 @@ func PatchMatches(g *gin.Context) {
 		return
 	}
 
-	data, _ := repository.GetMatchFromID(db, match.Id)
+	data, _ := repository.GetMatchesByID(db, match.ID)
 
-	if data.Id == "" {
+	if data.ID == "" {
 		helpers.SendError(g, http.StatusBadRequest, errors.New("matchId does not exist"))
 		return
 	}
 
-	err := repository.PatchMatch(db, match)
+	err := repository.PatchMatches(db, match)
 	if err != nil {
 		helpers.SendError(g, http.StatusBadRequest, err)
 		return
