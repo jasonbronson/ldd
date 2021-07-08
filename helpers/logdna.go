@@ -13,8 +13,8 @@ func init() {
 	client = logdnasdk.New(config.Cfg.ServiceKey)
 }
 
-func GetLogs(startTime int64, endTime int64, levels string, query string) (logsLine logdnasdk.ExportReponse, err error) {
-	logsLine, err = client.GetLog(startTime, endTime, levels, query)
+func GetLogs(startTime int64, endTime int64, levels string, query string, apps string) (logsLine logdnasdk.ExportReponse, err error) {
+	logsLine, err = client.GetLog(startTime, endTime, levels, query, apps)
 
 	if err != nil {
 		log.Println("error getting logs ", logsLine)

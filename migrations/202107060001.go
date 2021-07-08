@@ -248,7 +248,7 @@ func (s *LogsMigrations) TableInfo() *TableInfo {
 
 // LogsFoundMigrations struct is a row record of the schema_migrations table in the main database
 type LogsFoundMigrations struct {
-	LogsID    string    `gorm:"primary_key;column:logs_id;type:VARCHAR;" json:"logs_id"`
+	LogsID    string    `gorm:"column:logs_id;type:VARCHAR;" json:"logs_id"`
 	TimeStart null.Time `gorm:"column:time_start;type:DATETIME;" json:"time_start"`
 	TimeEnd   null.Time `gorm:"column:time_end;type:DATETIME;" json:"time_end"`
 }
@@ -265,7 +265,7 @@ var logsFoundTableInfo = &TableInfo{
 			Nullable:           false,
 			DatabaseTypeName:   "VARCHAR",
 			DatabaseTypePretty: "VARCHAR",
-			IsPrimaryKey:       true,
+			IsPrimaryKey:       false,
 			IsAutoIncrement:    false,
 			IsArray:            false,
 			ColumnType:         "VARCHAR",
@@ -349,9 +349,10 @@ func (s *LogsFoundMigrations) TableInfo() *TableInfo {
 // LogsFoundMigrations struct is a row record of the schema_migrations table in the main database
 type MatchesMigrations struct {
 	ID             string `gorm:"primary_key;column:id;type:VARCHAR;" json:"id"`
-	MatchingString string `gorm:"primary_key;column:matching_string;type:VARCHAR;" json:"matching_string"`
-	Name           string `gorm:"primary_key;column:name;type:VARCHAR;" json:"name"`
-	Description    string `gorm:"primary_key;column:description;type:VARCHAR;" json:"description"`
+	MatchingString string `gorm:"column:matching_string;type:VARCHAR;" json:"matching_string"`
+	Apps           string `gorm:"column:apps;type:VARCHAR;" json:"apps"`
+	Name           string `gorm:"column:name;type:VARCHAR;" json:"name"`
+	Description    string `gorm:"column:description;type:VARCHAR;" json:"description"`
 }
 
 var matchesTableInfo = &TableInfo{
@@ -402,6 +403,27 @@ var matchesTableInfo = &TableInfo{
 
 		{
 			Index:              2,
+			Name:               "apps",
+			Comment:            ``,
+			Notes:              ``,
+			Nullable:           false,
+			DatabaseTypeName:   "VARCHAR",
+			DatabaseTypePretty: "VARCHAR",
+			IsPrimaryKey:       false,
+			IsAutoIncrement:    false,
+			IsArray:            false,
+			ColumnType:         "VARCHAR",
+			ColumnLength:       -1,
+			GoFieldName:        "Apps",
+			GoFieldType:        "string",
+			JSONFieldName:      "apps",
+			ProtobufFieldName:  "apps",
+			ProtobufType:       "string",
+			ProtobufPos:        3,
+		},
+
+		{
+			Index:              3,
 			Name:               "name",
 			Comment:            ``,
 			Notes:              ``,
@@ -418,11 +440,11 @@ var matchesTableInfo = &TableInfo{
 			JSONFieldName:      "name",
 			ProtobufFieldName:  "name",
 			ProtobufType:       "string",
-			ProtobufPos:        3,
+			ProtobufPos:        4,
 		},
 
 		{
-			Index:              3,
+			Index:              4,
 			Name:               "description",
 			Comment:            ``,
 			Notes:              ``,
@@ -439,7 +461,7 @@ var matchesTableInfo = &TableInfo{
 			JSONFieldName:      "description",
 			ProtobufFieldName:  "description",
 			ProtobufType:       "string",
-			ProtobufPos:        4,
+			ProtobufPos:        5,
 		},
 	},
 }

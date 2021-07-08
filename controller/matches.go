@@ -24,7 +24,7 @@ func GetAllMatches(g *gin.Context) {
 	resp, err := repository.GetAllMatches(db)
 
 	if err != nil {
-		helpers.SendError(g, http.StatusBadRequest, err)
+		helpers.SendError(g.Writer, http.StatusBadRequest, err)
 		return
 	}
 
@@ -39,23 +39,29 @@ func PostMatches(g *gin.Context) {
 	var match models.Matches
 
 	if err := g.ShouldBindJSON(&requestData); err != nil {
-		helpers.SendError(g, http.StatusInternalServerError, fmt.Errorf("unable to marshal JSON: %v", err))
+		helpers.SendError(g.Writer, http.StatusInternalServerError, fmt.Errorf("unable to marshal JSON: %v", err))
 		return
 	}
 
 	fmt.Println(requestData.Matching_string)
 
 	match.MatchingString = requestData.Matching_string
+	match.Apps = requestData.Apps
 	match.Name = requestData.Name
 	match.Description = requestData.Description
 
 	if match.Name == "" || match.Description == "" {
-		helpers.SendError(g, http.StatusBadRequest, errors.New("name or description was empty"))
+		helpers.SendError(g.Writer, http.StatusBadRequest, errors.New("name or description was empty"))
 		return
 	}
 
 	if match.MatchingString == "" {
-		helpers.SendError(g, http.StatusBadRequest, errors.New("matching_string was empty"))
+		helpers.SendError(g.Writer, http.StatusBadRequest, errors.New("matching_string was empty"))
+		return
+	}
+
+	if match.Apps == "" {
+		helpers.SendError(g.Writer, http.StatusBadRequest, errors.New("apps was empty"))
 		return
 	}
 
@@ -63,13 +69,13 @@ func PostMatches(g *gin.Context) {
 	data, _ := repository.GetMatchesByMatchString(db, match.MatchingString)
 
 	if data.MatchingString != "" {
-		helpers.SendError(g, http.StatusBadRequest, errors.New("matching_string already exists"))
+		helpers.SendError(g.Writer, http.StatusBadRequest, errors.New("matching_string already exists"))
 		return
 	}
 
 	err := repository.CreateMatches(db, match)
 	if err != nil {
-		helpers.SendError(g, http.StatusBadRequest, err)
+		helpers.SendError(g.Writer, http.StatusBadRequest, err)
 		return
 	}
 	helpers.SendSuccess(g.Writer, http.StatusOK, "SUCCESS")
@@ -86,40 +92,46 @@ func PatchMatches(g *gin.Context) {
 	matchId := g.Param("matchID")
 
 	if err := g.ShouldBindJSON(&requestData); err != nil {
-		helpers.SendError(g, http.StatusInternalServerError, fmt.Errorf("unable to marshal JSON: %v", err))
+		helpers.SendError(g.Writer, http.StatusInternalServerError, fmt.Errorf("unable to marshal JSON: %v", err))
 		return
 	}
 
 	match.MatchingString = requestData.Matching_string
 	match.Name = requestData.Name
 	match.Description = requestData.Description
+	match.Apps = requestData.Apps
 	match.ID = matchId
 
 	if matchId == "" {
-		helpers.SendError(g, http.StatusNotFound, fmt.Errorf("matchid was empty"))
+		helpers.SendError(g.Writer, http.StatusNotFound, fmt.Errorf("matchid was empty"))
 		return
 	}
 
 	if match.Name == "" || match.Description == "" {
-		helpers.SendError(g, http.StatusBadRequest, errors.New("name or description was empty"))
+		helpers.SendError(g.Writer, http.StatusBadRequest, errors.New("name or description was empty"))
 		return
 	}
 
 	if match.MatchingString == "" {
-		helpers.SendError(g, http.StatusBadRequest, errors.New("matching_string was empty"))
+		helpers.SendError(g.Writer, http.StatusBadRequest, errors.New("matching_string was empty"))
+		return
+	}
+
+	if match.Apps == "" {
+		helpers.SendError(g.Writer, http.StatusBadRequest, errors.New("apps was empty"))
 		return
 	}
 
 	data, _ := repository.GetMatchesByID(db, match.ID)
 
 	if data.ID == "" {
-		helpers.SendError(g, http.StatusBadRequest, errors.New("matchId does not exist"))
+		helpers.SendError(g.Writer, http.StatusBadRequest, errors.New("matchId does not exist"))
 		return
 	}
 
 	err := repository.PatchMatches(db, match)
 	if err != nil {
-		helpers.SendError(g, http.StatusBadRequest, err)
+		helpers.SendError(g.Writer, http.StatusBadRequest, err)
 		return
 	}
 	helpers.SendSuccess(g.Writer, http.StatusOK, "SUCCESS")
