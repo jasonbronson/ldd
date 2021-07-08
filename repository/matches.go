@@ -10,6 +10,7 @@ import (
 type MatchesRequest struct {
 	Matching_string string `form:"matching_string" json:"matching_string"`
 	Name            string `form:"name" json:"name"`
+	Apps            string `form:"apps" json:"apps"`
 	Description     string `form:"description" json:"description"`
 }
 

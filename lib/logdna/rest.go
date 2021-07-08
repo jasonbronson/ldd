@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -47,6 +48,10 @@ func processResponse(resp *http.Response, result interface{}) error {
 	if err != nil {
 		log.Printf("Error processing response: %v", err)
 		return err
+	}
+
+	if resp.StatusCode != 200 {
+		return errors.New("error to get logs from logdna: " + string(body))
 	}
 	err = json.Unmarshal(body, result)
 	if err != nil {

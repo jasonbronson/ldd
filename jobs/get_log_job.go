@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/jasonbronson/ldd/config"
@@ -13,7 +14,7 @@ import (
 )
 
 const (
-	GetLogJobInterval = "@every 0h1m0s"
+	GetLogJobInterval = "@every 0h5m0s"
 )
 
 func GetLogJob() {
@@ -29,21 +30,23 @@ func GetLogJob() {
 	}
 
 	if len(allMatches) < 1 {
-		log.Println("There are no MatchingString in the Matches table")
+		log.Println("There are no matching string in the matches table")
 		return
 	}
 
 	for _, item := range allMatches {
 
 		match := item.MatchingString
-		log.Printf("Loading logs from logdna using query: %v \n", match)
-		data, err := helpers.GetLogs(startTime, endTime, levels, match)
+		apps := item.Apps
+		log.Printf("Loading logs from logdna using query: '%v' and apps: '%v' \n", match, apps)
+		data, err := helpers.GetLogs(startTime, endTime, levels, match, apps)
 		if err != nil {
 			log.Println(err)
 			return
 		}
-		// fmt.Println(data)
+
 		for _, i := range data.Lines {
+
 			if CheckMatchStringAgainstLine(i.Line, match) {
 				logLine := &models.Logs{
 					LogLine:        i.Line,
@@ -74,7 +77,6 @@ func UpdateDB(logs *models.Logs, logsFound *models.LogsFound) {
 		//Print the logs
 		logsJson, _ := json.Marshal(logs)
 		log.Println(string(logsJson))
-
 		err := repository.CreateLogs(config.Cfg.GormDB, *logs)
 		if err != nil {
 			log.Println("Error to CreateLogs: ", err)
@@ -99,6 +101,6 @@ func UpdateDB(logs *models.Logs, logsFound *models.LogsFound) {
 }
 
 func CheckMatchStringAgainstLine(line, matchString string) bool {
-	regex := regexp.MustCompile(matchString + `\b`)
-	return regex.MatchString(line)
+	regex := regexp.MustCompile(strings.ToLower(matchString) + `\b`)
+	return regex.MatchString(strings.ToLower(line))
 }

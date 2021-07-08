@@ -2,7 +2,6 @@ package controller
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jasonbronson/ldd/config"
@@ -14,20 +13,10 @@ func GetLogMatches(g *gin.Context) {
 	db := config.Cfg.GormDB
 	db = db.WithContext(g)
 
-	defaultLimit := 20
-	var limitInt int
-
-	limit := g.Request.URL.Query().Get("limit")
-	limitInt, _ = strconv.Atoi(limit)
-
-	if limit == "" {
-		limitInt = defaultLimit
-	}
-
-	resp, err := repository.GetLogsLine(db, limitInt)
+	resp, err := repository.GetLogsLine(db)
 
 	if err != nil {
-		helpers.SendError(g, http.StatusBadRequest, err)
+		helpers.SendError(g.Writer, http.StatusBadRequest, err)
 		return
 	}
 

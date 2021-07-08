@@ -8,6 +8,7 @@ import (
 type Matches struct {
 	ID             string `gorm:"primary_key" json:"id"`
 	MatchingString string `json:"matching_string"`
+	Apps           string `json:"apps"`
 	Name           string `json:"name"`
 	Description    string `json:"description"`
 }
